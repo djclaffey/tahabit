@@ -1,0 +1,78 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Accountability Habit - CEO Coaching & Strategy Advisory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <header class="bg-blue-900 text-white text-center py-12">
+    <h1 class="text-4xl font-bold">The Accountability Habit</h1>
+    <p class="mt-2 text-lg">CEO Coaching & Strategy Advisory for Tech, MedTech, and SaaS Leaders</p>
+  </header>
+  
+  <main class="max-w-3xl mx-auto px-6 py-12">
+    <section class="space-y-6 text-gray-800">
+      <p class="text-lg">
+        At The Accountability Habit, I work with CEOs of startups and PE-backed growth companies in technology, medical devices, and SaaS to navigate the unique demands of leadership. As a former tech CEO who scaled and sold my company to private equity, I bring firsthand experience of being "in the chair," combined with McKinsey-honed strategy expertise and a deep understanding of rocket science problem-solving and people science.
+      </p>
+      <p class="text-lg">
+        My approach equips leaders to tackle complex challenges, manage and lead their boards effectively, align teams, and drive sustainable growth. Beyond business strategy, I help CEOs optimize their personal foundations—health, sleep, nutrition, and relationships both in and out of work—to ensure they perform at their best. My goal is to help you turn vision into reality with clarity and confidence.
+      </p>
+      <p class="text-lg">
+        Whether you’re steering a fast-growing startup or a PE-backed company, I’m here to provide tailored coaching and strategic guidance. Let’s work together to elevate your performance and grow your business. Contact me to discuss how The Accountability Habit can support your leadership journey.
+      </p>
+    </section>
+    
+    <div class="text-center mt-8">
+      <a href="mailto:contact@theaccountabilityhabit.com" class="inline-block bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition">
+        Get in Touch
+      </a>
+    </div>
+  </main>
+  
+  <footer class="bg-gray-200 text-center py-4 text-gray-600">
+    <p>&copy; 2025 The Accountability Habit. All rights reserved.</p>
+  </footer>
+</body>
+</html>
